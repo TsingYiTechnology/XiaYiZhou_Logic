@@ -1,0 +1,10 @@
+﻿{
+  "Name": "xiayizhoulogic",
+  "Author": "Grey-Wind",
+  "Version": "0.0.1",
+  "Description": "xia yi zhou",
+  "UniqueID": "greywind.xiayizhou",
+  "EntryDll": "xiayizhou.dll",
+  "MinimumApiVersion": "4.0.0",
+  "UpdateKeys": []
+}
