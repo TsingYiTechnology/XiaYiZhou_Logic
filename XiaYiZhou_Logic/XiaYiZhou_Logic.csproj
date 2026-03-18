@@ -1,11 +1,11 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>disable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <AssemblyName>xiayizhou</AssemblyName>
-    <Version>0.0.1</Version>
+    <Version>0.0.2</Version>
     <Title>Xia Yi Zhou</Title>
     <Authors>Grey-Wind</Authors>
     <Company>Tsing Yi Technology</Company>
@@ -19,6 +19,28 @@
     <None Update="manifest.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="Portraits\XiaYiZhou\assets\XiaYiZhou\XiaYiZhou_fall.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Portraits\XiaYiZhou\assets\XiaYiZhou\XiaYiZhou_marry.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Portraits\XiaYiZhou\assets\XiaYiZhou\XiaYiZhou_spring.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Portraits\XiaYiZhou\assets\XiaYiZhou\XiaYizhou_summer.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Portraits\XiaYiZhou\assets\XiaYiZhou\XiaYiZhou_winter.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Portraits\XiaYiZhou\XiaYiZhou_default.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Portraits\XiaYiZhou\assets\XiaYiZhou\" />
   </ItemGroup>
 
 </Project>

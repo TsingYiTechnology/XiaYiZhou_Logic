@@ -1,7 +1,7 @@
 ﻿{
   "Name": "xiayizhoulogic",
   "Author": "Grey-Wind",
-  "Version": "0.0.1",
+  "Version": "0.0.2",
   "Description": "xia yi zhou",
   "UniqueID": "greywind.xiayizhou",
   "EntryDll": "xiayizhou.dll",

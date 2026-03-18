@@ -31,12 +31,12 @@ namespace XiaYiZhou_Logic
             // 阿比盖尔配置
             _manager!.AddCharacter(new CharacterConfig
             {
-                Id = "Portraits/Abigail",
-                DefaultPortraitPath = "assets/abigail_default.png",
-                SeasonTemplate = "assets/abigail/abigail_{{season}}.png",
+                Id = "Portraits/XiaYiZhou",
+                DefaultPortraitPath = "assets/XiaYiZhou_default.png",
+                SeasonTemplate = "assets/XiaYiZhou/XiaYiZhou_{{season}}.png",
                 EventRules = new List<EventRuleConfig>
                 {
-                    new EventRuleConfig { EventId = "558291", PortraitPath = "assets/abigail/event_4heart.png" }
+                    // new EventRuleConfig { EventId = "558291", PortraitPath = "assets/XiaYiZhou/event_4heart.png" }
                 }
             });
 
