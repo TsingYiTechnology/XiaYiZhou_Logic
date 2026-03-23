@@ -31,7 +31,7 @@ namespace XiaYiZhou_Logic
             // 配置
             _manager!.AddCharacter(new CharacterConfig
             {
-                Id = "Portraits/Xiayizhou",
+                Id = "Xiayizhou",
                 DefaultPortraitPath = "assets/XiaYiZhou_default.png",
                 SeasonTemplate = "assets/XiaYiZhou/XiaYiZhou_{{season}}.png",
                 EventRules = new List<EventRuleConfig>
