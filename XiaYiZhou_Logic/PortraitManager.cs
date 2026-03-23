@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
 using StardewValley;
 
@@ -11,6 +12,8 @@ namespace XiaYiZhou_Logic
         private readonly IModHelper _helper;
         private readonly IMonitor _monitor;
         private readonly Dictionary<string, CharacterConfig> _characters = new();
+        private readonly Dictionary<string, PortraitGridInfo> _gridCache = new();
+        private readonly Dictionary<Texture2D, string> _textureToAssetKey = new(); // 纹理→assetKey映射
 
         public PortraitManager(IModHelper helper, IMonitor monitor)
         {
@@ -18,18 +21,15 @@ namespace XiaYiZhou_Logic
             _monitor = monitor;
         }
 
-        public void AddCharacter(CharacterConfig character)
-        {
-            _characters[character.Id!] = character;
-        }
+        public void AddCharacter(CharacterConfig character) => _characters[character.Id!] = character;
 
-        /// <summary>获取指定角色的当前肖像路径（若无可用的自定义路径，返回 null）</summary>
+        /// <summary>获取角色肖像路径（支持事件、季节、默认）</summary>
         public string GetCurrentPortraitPath(string assetKey)
         {
             if (!_characters.TryGetValue(assetKey, out var character))
-                return null!; // 未配置的角色，使用原版
+                return null!;
 
-            // 1. 检查事件规则
+            // 1. 事件规则
             if (Game1.eventUp && Game1.CurrentEvent != null)
             {
                 string currentEventId = Game1.CurrentEvent.id;
@@ -44,7 +44,7 @@ namespace XiaYiZhou_Logic
                 }
             }
 
-            // 2. 检查季节规则
+            // 2. 季节规则
             if (!string.IsNullOrEmpty(character.SeasonTemplate))
             {
                 string season = Game1.currentSeason;
@@ -56,7 +56,7 @@ namespace XiaYiZhou_Logic
                     _monitor.Log($"Season portrait missing: {seasonPath}", LogLevel.Trace);
             }
 
-            // 3. 回退到默认肖像
+            // 3. 默认肖像
             if (!string.IsNullOrEmpty(character.DefaultPortraitPath))
             {
                 string fullPath = Path.Combine(_helper.DirectoryPath, character.DefaultPortraitPath);
@@ -66,8 +66,63 @@ namespace XiaYiZhou_Logic
                     _monitor.Log($"Default portrait missing: {character.DefaultPortraitPath}", LogLevel.Warn);
             }
 
-            // 4. 没有任何自定义文件，使用原版
             return null!;
+        }
+
+        /// <summary>获取纹理网格信息</summary>
+        public PortraitGridInfo GetPortraitGridInfo(string assetKey, Texture2D texture)
+        {
+            if (_gridCache.TryGetValue(assetKey, out var info))
+                return info;
+
+            if (!_characters.TryGetValue(assetKey, out var config))
+                return new PortraitGridInfo(64, texture.Width / 64);
+
+            // 优先使用配置中的值
+            if (config.GridTileSize.HasValue && config.GridColumns.HasValue)
+            {
+                info = new PortraitGridInfo(config.GridTileSize.Value, config.GridColumns.Value);
+            }
+            else
+            {
+                int gcd = GCD(texture.Width, texture.Height);
+                int tileSize = gcd;
+                int columns = texture.Width / tileSize;
+                if (texture.Width % tileSize != 0 || texture.Height % tileSize != 0)
+                {
+                    tileSize = 64;
+                    columns = texture.Width / 64;
+                }
+                info = new PortraitGridInfo(tileSize, columns);
+            }
+
+            _gridCache[assetKey] = info;
+            return info;
+        }
+
+        /// <summary>记录纹理与assetKey的映射</summary>
+        public void RegisterTexture(Texture2D texture, string assetKey)
+        {
+            if (!_textureToAssetKey.ContainsKey(texture))
+                _textureToAssetKey[texture] = assetKey;
+        }
+
+        /// <summary>根据纹理获取assetKey</summary>
+        public string GetAssetKeyFromTexture(Texture2D texture)
+        {
+            _textureToAssetKey.TryGetValue(texture, out var key);
+            return key!;
+        }
+
+        private static int GCD(int a, int b)
+        {
+            while (b != 0)
+            {
+                int temp = b;
+                b = a % b;
+                a = temp;
+            }
+            return a;
         }
 
         public IEnumerable<string> GetAllCharacterAssetKeys() => _characters.Keys;
@@ -75,10 +130,12 @@ namespace XiaYiZhou_Logic
 
     public class CharacterConfig
     {
-        public string? Id { get; set; }                // 资源键，例如 "Portraits/Abigail"
+        public string? Id { get; set; }
         public string? DefaultPortraitPath { get; set; }
-        public string? SeasonTemplate { get; set; }    // 支持 {{season}} 占位符
+        public string? SeasonTemplate { get; set; }
         public List<EventRuleConfig>? EventRules { get; set; }
+        public int? GridTileSize { get; set; }   // 可选：手动指定格子大小
+        public int? GridColumns { get; set; }    // 可选：手动指定一行格子数
     }
 
     public class EventRuleConfig
@@ -86,4 +143,6 @@ namespace XiaYiZhou_Logic
         public string? EventId { get; set; }
         public string? PortraitPath { get; set; }
     }
+
+    public record PortraitGridInfo(int TileSize, int Columns);
 }

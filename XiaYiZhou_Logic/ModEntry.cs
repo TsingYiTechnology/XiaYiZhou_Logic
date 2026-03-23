@@ -1,61 +1,60 @@
 ﻿using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
+using HarmonyLib;
 using System.Collections.Generic;
 
 namespace XiaYiZhou_Logic
 {
     public class ModEntry : Mod
     {
+        private static PortraitManager? _staticManager;
         private PortraitManager? _manager;
         private string? _lastEventId;
+
+        public static PortraitManager GetPortraitManager() => _staticManager!;
 
         public override void Entry(IModHelper helper)
         {
             _manager = new PortraitManager(helper, Monitor);
+            _staticManager = _manager;
             LoadCharacters();
 
-#pragma warning disable CS8622 // 参数类型中引用类型的为 Null 性与目标委托不匹配(可能是由于为 Null 性特性)。
-            // 订阅资源请求事件
             helper.Events.Content.AssetRequested += OnAssetRequested;
-
-            // 订阅条件变化事件
             helper.Events.GameLoop.DayStarted += OnDayStarted;
             helper.Events.GameLoop.UpdateTicked += OnUpdateTicked;
             helper.Events.Player.Warped += OnWarped;
-#pragma warning restore CS8622 // 参数类型中引用类型的为 Null 性与目标委托不匹配(可能是由于为 Null 性特性)。
+
+            var harmony = new Harmony(ModManifest.UniqueID);
+            harmony.PatchAll();
         }
 
         private void LoadCharacters()
         {
-            // 配置
             _manager!.AddCharacter(new CharacterConfig
             {
-                Id = "Xiayizhou",
+                Id = "Xiayizhou",           // 对应资源键 "Portraits/Xiayizhou"
                 DefaultPortraitPath = "assets/XiaYiZhou_default.png",
                 SeasonTemplate = "assets/XiaYiZhou/XiaYiZhou_{{season}}.png",
-                EventRules = new List<EventRuleConfig>
-                {
-                    // new EventRuleConfig { EventId = "558291", PortraitPath = "assets/XiaYiZhou/???.png" }
-                }
+                GridTileSize = 500,
+                GridColumns = 2,
+                EventRules = new List<EventRuleConfig>()
             });
-
-            // 可以继续添加其他角色...
         }
 
         private void OnAssetRequested(object sender, AssetRequestedEventArgs e)
         {
-            // 只处理我们关心的肖像资源
             if (!e.Name.StartsWith("Portraits/"))
                 return;
 
-            string assetKey = e.Name.Name; // 例如 "Portraits/Abigail"
+            string assetKey = e.Name.Name;
             string customPath = _manager!.GetCurrentPortraitPath(assetKey);
             if (customPath == null)
-                return; // 没有自定义文件，让游戏使用原版
+                return;
 
-            // 提供自定义纹理
             e.LoadFromModFile<Microsoft.Xna.Framework.Graphics.Texture2D>(customPath, AssetLoadPriority.Exclusive);
+            // 注意：无法在此处获取加载后的纹理，因为 LoadFromModFile 是异步的，所以纹理映射需要在补丁中动态获取
+            // 替代方案：在绘制时通过 assetKey 动态获取纹理，不依赖映射表
         }
 
         private void OnDayStarted(object sender, DayStartedEventArgs e)
