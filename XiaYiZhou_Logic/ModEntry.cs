@@ -28,15 +28,15 @@ namespace XiaYiZhou_Logic
 
         private void LoadCharacters()
         {
-            // 阿比盖尔配置
+            // 配置
             _manager!.AddCharacter(new CharacterConfig
             {
-                Id = "Portraits/XiaYiZhou",
+                Id = "Portraits/Xiayizhou",
                 DefaultPortraitPath = "assets/XiaYiZhou_default.png",
                 SeasonTemplate = "assets/XiaYiZhou/XiaYiZhou_{{season}}.png",
                 EventRules = new List<EventRuleConfig>
                 {
-                    // new EventRuleConfig { EventId = "558291", PortraitPath = "assets/XiaYiZhou/event_4heart.png" }
+                    // new EventRuleConfig { EventId = "558291", PortraitPath = "assets/XiaYiZhou/???.png" }
                 }
             });
 
